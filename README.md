@@ -25,7 +25,7 @@ A dependency-free, read-only toolkit for inspecting binary files: hex/ASCII dump
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/arraypress/swift-binary-inspect.git", from: "1.0.0")
+    .package(url: "https://github.com/Sidewatch/swift-binary-inspect.git", from: "1.0.0")
 ]
 ```
 
