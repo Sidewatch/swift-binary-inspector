@@ -51,12 +51,14 @@ public enum HexDump {
         let start = min(max(0, from), data.count)
         let end = min(data.count, length.map { start + max(0, $0) } ?? data.count)
         guard start < end else { return [] }
+        // Data slices keep their parent's indices — subscript relative to startIndex.
+        let base = data.startIndex
         var rows: [Row] = []
         rows.reserveCapacity((end - start + width - 1) / width)
         var i = start
         while i < end {
             let rowEnd = min(i + width, end)
-            rows.append(Row(offset: UInt64(i), bytes: [UInt8](data[i..<rowEnd])))
+            rows.append(Row(offset: UInt64(i), bytes: [UInt8](data[(base + i)..<(base + rowEnd)])))
             i = rowEnd
         }
         return rows

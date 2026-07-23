@@ -45,6 +45,25 @@ final class BinaryInspectTests: XCTestCase {
         XCTAssertTrue(out.hasSuffix("|..|"), out)       // 0xDE/0xAD not printable
     }
 
+    // Regression: rows/render subscripted with zero-based positions, trapping on a
+    // Data slice that keeps its parent's non-zero indices.
+    func testHexDumpHandlesDataSliceWithNonZeroStartIndex() {
+        let parent = Data((0..<64).map { UInt8($0) })
+        let slice = parent[16...]
+        XCTAssertEqual(slice.startIndex, 16)
+        let rows = HexDump.rows(of: slice, bytesPerRow: 16)
+        XCTAssertEqual(rows.count, 3)
+        XCTAssertEqual(rows[0].offset, 0)               // offsets are within the slice
+        XCTAssertEqual(rows[0].bytes, Array(16..<32).map { UInt8($0) })
+        XCTAssertEqual(rows[2].bytes, Array(48..<64).map { UInt8($0) })
+        XCTAssertTrue(HexDump.render(slice).hasPrefix("00000000  10 11"), HexDump.render(slice))
+
+        let windowed = HexDump.rows(of: slice, bytesPerRow: 8, from: 8, length: 8)
+        XCTAssertEqual(windowed.count, 1)
+        XCTAssertEqual(windowed[0].offset, 8)
+        XCTAssertEqual(windowed[0].bytes, Array(24..<32).map { UInt8($0) })
+    }
+
     // MARK: - MagicBytes
 
     func testMagicPNG() {
