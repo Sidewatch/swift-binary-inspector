@@ -32,6 +32,20 @@ enum ByteReader {
             : (b[3] << 24) | (b[2] << 16) | (b[1] << 8) | b[0]
     }
 
+    /// Read a `UInt64` at `offset`, big- or little-endian. `nil` if out of range.
+    static func u64(_ d: Data, _ offset: Int, bigEndian: Bool) -> UInt64? {
+        guard offset >= 0, offset + 8 <= d.count else { return nil }
+        let s = d.startIndex + offset
+        var v: UInt64 = 0
+        // Accumulate most-significant byte first, walking the bytes in whichever
+        // direction the requested order implies.
+        for i in 0..<8 {
+            let byte = UInt64(d[s + (bigEndian ? i : 7 - i)])
+            v = (v << 8) | byte
+        }
+        return v
+    }
+
     /// True when `data` begins with `prefix`.
     static func hasPrefix(_ data: Data, _ prefix: [UInt8]) -> Bool {
         guard data.count >= prefix.count else { return false }
