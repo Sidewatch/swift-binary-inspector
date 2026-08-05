@@ -14,7 +14,8 @@ let package = Package(
         .library(name: "BinaryInspect", targets: ["BinaryInspect"]),
     ],
     targets: [
-        .target(name: "BinaryInspect", path: "Sources"),
+        .target(name: "BinaryInspect", path: "Sources",
+                swiftSettings: [.unsafeFlags(["-strict-concurrency=complete"])]),
         .testTarget(name: "BinaryInspectTests", dependencies: ["BinaryInspect"], path: "Tests"),
     ]
 )
