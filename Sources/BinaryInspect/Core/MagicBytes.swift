@@ -15,13 +15,13 @@ import Foundation
 public enum MagicBytes {
 
     /// A broad grouping, so a UI can pick an icon/tint without string-matching names.
-    public enum Category: String {
+    public enum Category: String, Sendable {
         case image, archive, executable, document, audio, video, database, font, other
     }
 
     /// An identified type: a human name, the conventional extension/MIME when there is
     /// one, and a coarse category.
-    public struct FileType: Equatable {
+    public struct FileType: Equatable, Sendable {
         public let name: String
         public let ext: String?
         public let mime: String?
