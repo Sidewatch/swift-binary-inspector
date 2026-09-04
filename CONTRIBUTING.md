@@ -25,6 +25,13 @@ flat. Tests mirror the module: `Tests/<Module>Tests/<Type>Tests.swift`.
 
 - **No repeated code.** A helper needed twice becomes one `Support/` function or an
   `Extensions/` member. Never copy a helper between packages; promote it to a shared package.
+- **One type per file.** A file is named for the one public type it declares; a file with two
+  models is two files. Private helper types a type needs may sit beneath it in the same file.
+- **Long functions are several functions.** A function that walks, sorts, filters and formats is
+  four helpers with names; anything reading the same `resourceValues` / `JSONSerialization` /
+  `trimmingCharacters` twice is one `Extensions/` member (`URL.isDirectory`, not three inline
+  reads). A type handles its own domain only: an adapter for OpenCode contains nothing that is
+  not about OpenCode.
 - **Models are only models.** Parsing, assembly and validation live in `Support/`, reached
   through thin `Extensions/` where that reads better.
 - **Swift 6 language mode, tools 6.2, macOS 14+.** No `unsafeFlags` in `Package.swift`: they make
