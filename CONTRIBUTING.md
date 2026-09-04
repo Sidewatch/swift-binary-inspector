@@ -27,7 +27,7 @@ flat. Tests mirror the module: `Tests/<Module>Tests/<Type>Tests.swift`.
   `Extensions/` member. Never copy a helper between packages; promote it to a shared package.
 - **Models are only models.** Parsing, assembly and validation live in `Support/`, reached
   through thin `Extensions/` where that reads better.
-- **Swift 6 language mode, tools 6.0, macOS 14+.** No `unsafeFlags` in `Package.swift`: they make
+- **Swift 6 language mode, tools 6.2, macOS 14+.** No `unsafeFlags` in `Package.swift`: they make
   the package unusable as a URL dependency.
 - **Public API is documented** with `///`. Anything not needed outside the module is `internal`.
 - **Tests are mutation-verified.** A new test must FAIL against the code before your change,

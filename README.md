@@ -24,7 +24,7 @@ Every inspection type is read-only and never mutates the `Data` it is handed. Th
 ## Requirements
 
 - macOS 14+ (Foundation only; other Apple platforms at SwiftPM's default minimums)
-- Swift 6.0+ (Swift 6 language mode)
+- Swift 6.2+ (Swift 6 language mode)
 
 ## Installation
 
