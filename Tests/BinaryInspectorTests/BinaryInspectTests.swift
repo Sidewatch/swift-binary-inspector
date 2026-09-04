@@ -1,5 +1,5 @@
 //
-//  BinaryInspectTests.swift
+//  BinaryInspectorTests.swift
 //  Tests for SwiftBinaryInspect
 //
 //  Created by David Sherlock on 7/18/26.
@@ -8,7 +8,7 @@
 import XCTest
 @testable import BinaryInspector
 
-final class BinaryInspectTests: XCTestCase {
+final class BinaryInspectorTests: XCTestCase {
 
     // MARK: - HexDump
 

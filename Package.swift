@@ -10,6 +10,6 @@ let package = Package(
     targets: [
         .target(name: "BinaryInspector", path: "Sources",
                 swiftSettings: [.swiftLanguageMode(.v6)]),
-        .testTarget(name: "BinaryInspectTests", dependencies: ["BinaryInspector"], path: "Tests"),
+        .testTarget(name: "BinaryInspectorTests", dependencies: ["BinaryInspector"], path: "Tests"),
     ]
 )
