@@ -32,7 +32,7 @@ Every inspection type is read-only and never mutates the `Data` it is handed. Th
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/Sidewatch/swift-binary-inspector.git", from: "1.0.0")
+    .package(url: "https://github.com/Sidewatch/swift-binary-inspector.git", from: "0.1.0")
 ]
 ```
 
