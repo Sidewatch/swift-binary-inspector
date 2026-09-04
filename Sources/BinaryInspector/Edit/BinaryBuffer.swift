@@ -12,7 +12,7 @@ import Foundation
 
 /// An editable view over a blob, backed by a piece table.
 ///
-/// Everything else in `BinaryInspect` is read-only and never touches its input. This type
+/// Everything else in `BinaryInspector` is read-only and never touches its input. This type
 /// is the deliberate exception, and it still never mutates the `Data` it was handed: the
 /// original stays immutable, inserted bytes accumulate in a separate append-only buffer,
 /// and the document is described by an ordered list of pieces pointing into one or the

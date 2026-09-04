@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import BinaryInspect
+@testable import BinaryInspector
 
 final class BinaryEditTests: XCTestCase {
 

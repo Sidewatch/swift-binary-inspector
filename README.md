@@ -1,4 +1,4 @@
-# Swift Binary Inspect
+# Swift Binary Inspector
 
 A dependency-free toolkit for inspecting binary files: hex/ASCII dumping, magic-byte file-type identification, printable-string extraction, Shannon entropy, byte-pattern search, per-offset scalar decoding, offset-aligned byte diffing, and structural header parsing for the common executable formats (Mach-O, ELF, PE/COFF, Java class, WebAssembly) — plus a piece-table buffer for editing. Pure Foundation, zero dependencies.
 
@@ -32,14 +32,14 @@ Every inspection type is read-only and never mutates the `Data` it is handed. Th
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/Sidewatch/swift-binary-inspect.git", from: "1.0.0")
+    .package(url: "https://github.com/Sidewatch/swift-binary-inspector.git", from: "1.0.0")
 ]
 ```
 
 ## Usage
 
 ```swift
-import BinaryInspect
+import BinaryInspector
 import Foundation
 
 let data = try Data(contentsOf: url)

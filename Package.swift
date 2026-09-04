@@ -2,14 +2,14 @@
 import PackageDescription
 
 let package = Package(
-    name: "BinaryInspect",
+    name: "BinaryInspector",
     platforms: [.macOS(.v14)],
     products: [
-        .library(name: "BinaryInspect", targets: ["BinaryInspect"]),
+        .library(name: "BinaryInspector", targets: ["BinaryInspector"]),
     ],
     targets: [
-        .target(name: "BinaryInspect", path: "Sources",
+        .target(name: "BinaryInspector", path: "Sources",
                 swiftSettings: [.swiftLanguageMode(.v6)]),
-        .testTarget(name: "BinaryInspectTests", dependencies: ["BinaryInspect"], path: "Tests"),
+        .testTarget(name: "BinaryInspectTests", dependencies: ["BinaryInspector"], path: "Tests"),
     ]
 )
