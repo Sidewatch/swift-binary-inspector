@@ -2,12 +2,17 @@
 //  BinaryEditTests.swift
 //  Tests for SwiftBinaryInspect — BinaryValues, BinaryDiff, BinaryBuffer
 //
+//  Tests for `BinaryValues`: little- and big-endian integer reads at an offset, and the edit
+//  helpers.
+//
 //  Created by David Sherlock on 8/4/26.
 //
 
 import XCTest
 @testable import BinaryInspector
 
+/// Tests for `BinaryValues`: little- and big-endian integer reads at an offset, and the edit
+/// helpers.
 final class BinaryEditTests: XCTestCase {
 
     // MARK: - BinaryValues

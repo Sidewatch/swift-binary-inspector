@@ -1,6 +1,9 @@
 //
-//  BinaryInspectorTests.swift
-//  Tests for SwiftBinaryInspect
+//  BinaryInspectTests.swift
+//  BinaryInspectorTests
+//
+//  Tests for `HexDump.rows` and the inspector's byte-level views: row offsets, short final
+//  rows, and printable columns.
 //
 //  Created by David Sherlock on 7/18/26.
 //
@@ -8,6 +11,8 @@
 import XCTest
 @testable import BinaryInspector
 
+/// Tests for `HexDump.rows` and the inspector's byte-level views: row offsets, short final
+/// rows, and printable columns.
 final class BinaryInspectorTests: XCTestCase {
 
     // MARK: - HexDump

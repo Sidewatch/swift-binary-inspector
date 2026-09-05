@@ -10,6 +10,8 @@
 import XCTest
 @testable import BinaryInspector
 
+/// Tests for `BinaryDiff.Result.summary`: identical, differing runs and bytes, length deltas,
+/// and the truncated note.
 final class BinaryDiffSummaryTests: XCTestCase {
 
     private func result(runs: [BinaryDiff.Run] = [], differing: Int = 0, delta: Int = 0, truncated: Bool = false) -> BinaryDiff.Result {
