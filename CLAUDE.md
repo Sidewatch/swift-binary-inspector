@@ -8,7 +8,7 @@ A dependency-free toolkit for inspecting binary files: hex/ASCII dumping, magic-
 
 ## Module map
 
-- `Core/` — the engine: BinaryDiff, BinaryFormat, BinaryStrings, BinaryValues, ByteReader, ByteSearch, Entropy, HexDump, MagicBytes
+- `Core/` — the engine: BinaryDiff, BinaryDiff+Summary, BinaryFormat, BinaryStrings, BinaryValues, ByteReader, ByteSearch, Entropy, HexDump, MagicBytes
 - `Edit/` — the engine: edit: BinaryBuffer
 
 ## Rules
