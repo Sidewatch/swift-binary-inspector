@@ -1,7 +1,8 @@
 # Audit log
 
-Last full audit: **17 Sep 2026** — every source file read for the checks below; nothing else needs re-checking
-unless it changed after that date. Add a dated line under *History* when you audit again, and keep the
+Last full audit: **17 Sep 2026** — every source file covered by the MECHANICAL checks below (build warnings, tests,
+dead-code and risk-pattern scans, docs drift); line-by-line logic review was targeted at the areas changed since
+5 Sep 2026, not the whole tree. Nothing needs re-scanning unless it changed after that date. Add a dated line under *History* when you audit again, and keep the
 *Known non-issues* list current so the next pass skips them.
 
 ## What a full audit checks
