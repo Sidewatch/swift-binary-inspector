@@ -9,7 +9,7 @@
 //
 
 import Foundation
-import DataConverter
+import FoundationExtensions
 
 extension BinaryDiff.Result {
     /// One status line: `b.bin: identical.`, or the parts that apply joined by ` · ` —

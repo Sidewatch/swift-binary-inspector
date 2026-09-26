@@ -8,11 +8,11 @@ let package = Package(
         .library(name: "BinaryInspector", targets: ["BinaryInspector"]),
     ],
     dependencies: [
-        .package(path: "../swift-data-converter"),
+        .package(path: "../swift-foundation-extensions"),
     ],
     targets: [
         .target(name: "BinaryInspector",
-                dependencies: [.product(name: "DataConverter", package: "swift-data-converter")],
+                dependencies: [.product(name: "FoundationExtensions", package: "swift-foundation-extensions")],
                 path: "Sources",
                 swiftSettings: [.swiftLanguageMode(.v6)]),
         .testTarget(name: "BinaryInspectorTests", dependencies: ["BinaryInspector"], path: "Tests"),
