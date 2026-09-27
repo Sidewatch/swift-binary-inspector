@@ -1,10 +1,11 @@
 //
 //  ByteSearch.swift
-//  SwiftBinaryInspect
+//  BinaryInspector
 //
 //  Find a byte pattern (hex or ASCII) in binary data — every match offset.
 //
 //  Created by David Sherlock on 7/18/26.
+//  Copyright © 2026 ArrayPress Limited. MIT licence.
 //
 
 import Foundation

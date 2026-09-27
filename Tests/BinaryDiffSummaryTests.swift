@@ -1,10 +1,11 @@
 //
 //  BinaryDiffSummaryTests.swift
-//  BinaryInspectorTests
+//  BinaryDiffSummaryTests.swift
 //
 //  Tests for the diff status line and the per-run hex preview.
 //
 //  Created by David Sherlock on 9/5/26.
+//  Copyright © 2026 ArrayPress Limited. MIT licence.
 //
 
 import XCTest

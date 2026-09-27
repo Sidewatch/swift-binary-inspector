@@ -1,11 +1,12 @@
 //
 //  BinaryDiff.swift
-//  SwiftBinaryInspect
+//  BinaryInspector
 //
 //  Offset-aligned byte comparison of two blobs — the "these two presets differ by one
 //  knob, show me where" instrument.
 //
 //  Created by David Sherlock on 8/4/26.
+//  Copyright © 2026 ArrayPress Limited. MIT licence.
 //
 
 import Foundation

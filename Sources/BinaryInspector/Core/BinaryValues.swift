@@ -1,11 +1,12 @@
 //
 //  BinaryValues.swift
-//  SwiftBinaryInspect
+//  BinaryInspector
 //
 //  Decode the bytes at an offset as every common fixed-width type — the "data inspector"
 //  panel behind a hex view's caret.
 //
 //  Created by David Sherlock on 8/4/26.
+//  Copyright © 2026 ArrayPress Limited. MIT licence.
 //
 
 import Foundation

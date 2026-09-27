@@ -1,10 +1,11 @@
 //
 //  HexDump.swift
-//  SwiftBinaryInspect
+//  BinaryInspector
 //
 //  Classic xxd-style hex + ASCII dump, as structured rows for a UI or a plain string.
 //
 //  Created by David Sherlock on 7/18/26.
+//  Copyright © 2026 ArrayPress Limited. MIT licence.
 //
 
 import Foundation

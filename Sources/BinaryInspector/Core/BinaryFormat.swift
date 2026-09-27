@@ -1,10 +1,11 @@
 //
 //  BinaryFormat.swift
-//  SwiftBinaryInspect
+//  BinaryInspector
 //
 //  Structural header parsing for the common executable formats: Mach-O, ELF, PE, Java, WASM.
 //
 //  Created by David Sherlock on 7/18/26.
+//  Copyright © 2026 ArrayPress Limited. MIT licence.
 //
 
 import Foundation

@@ -1,10 +1,11 @@
 //
 //  MagicBytes.swift
-//  SwiftBinaryInspect
+//  BinaryInspector
 //
 //  Best-effort file-type identification from leading magic bytes.
 //
 //  Created by David Sherlock on 7/18/26.
+//  Copyright © 2026 ArrayPress Limited. MIT licence.
 //
 
 import Foundation

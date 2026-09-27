@@ -1,10 +1,11 @@
 //
 //  ByteReader.swift
-//  SwiftBinaryInspect
+//  BinaryInspector
 //
 //  Bounds-checked little/big-endian integer reads over Data — shared by the format parsers.
 //
 //  Created by David Sherlock on 7/18/26.
+//  Copyright © 2026 ArrayPress Limited. MIT licence.
 //
 
 import Foundation

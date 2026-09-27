@@ -1,10 +1,11 @@
 //
 //  Entropy.swift
-//  SwiftBinaryInspect
+//  BinaryInspector
 //
 //  Shannon entropy — whole-file and per-block — for spotting compressed/encrypted regions.
 //
 //  Created by David Sherlock on 7/18/26.
+//  Copyright © 2026 ArrayPress Limited. MIT licence.
 //
 
 import Foundation

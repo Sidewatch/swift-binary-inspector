@@ -1,11 +1,12 @@
 //
 //  BinaryBuffer.swift
-//  SwiftBinaryInspect
+//  BinaryInspector
 //
 //  A piece-table byte buffer: insert, delete and overwrite at arbitrary offsets without
 //  copying the file, with undo/redo. The one MUTABLE type in this package.
 //
 //  Created by David Sherlock on 8/4/26.
+//  Copyright © 2026 ArrayPress Limited. MIT licence.
 //
 
 import Foundation
