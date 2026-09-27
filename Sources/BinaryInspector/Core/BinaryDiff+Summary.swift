@@ -17,18 +17,26 @@ extension BinaryDiff.Result {
     /// `3 runs, 17 bytes differ`, `b.bin is 2.0 KB longer` (naming whichever file is
     /// longer), `list capped — more differences follow`.
     public func summary(filename: String, compareName: String) -> String {
-        if identical { return "\(compareName): identical." }
+        if identical {
+            return String(localized: "\(compareName): identical.", bundle: .module,
+                          comment: "Binary compare status: the named comparison file has the same bytes.")
+        }
         var parts: [String] = []
         if !runs.isEmpty {
-            parts.append("\(runs.count.grouped) run\(runs.count == 1 ? "" : "s"), "
-                         + "\(differingBytes.grouped) byte\(differingBytes == 1 ? "" : "s") differ")
+            parts.append(String(localized: "\(runs.count) runs, \(differingBytes) bytes differ", bundle: .module,
+                                comment: "Binary compare status: how many stretches of bytes differ, and how many bytes in total."))
         }
         if lengthDelta != 0 {
             let longer = lengthDelta > 0 ? compareName : filename
-            parts.append("\(longer) is \(abs(lengthDelta).byteSizeLabel) longer")
+            parts.append(String(localized: "\(longer) is \(abs(lengthDelta).byteSizeLabel) longer", bundle: .module,
+                                comment: "Binary compare status: file name, then a size such as 2.0 KB."))
         }
-        if truncated { parts.append("list capped — more differences follow") }
-        return "\(compareName): " + parts.joined(separator: " · ")
+        if truncated {
+            parts.append(String(localized: "list capped — more differences follow", bundle: .module,
+                                comment: "Binary compare status: the list of differences stopped at its limit."))
+        }
+        return String(localized: "\(compareName): \(parts.joined(separator: " · "))", bundle: .module,
+                      comment: "Binary compare status: the comparison file name, then its findings joined by ·.")
     }
 }
 

@@ -3,6 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "BinaryInspector",
+    defaultLocalization: "en",
     platforms: [.macOS(.v14)],
     products: [
         .library(name: "BinaryInspector", targets: ["BinaryInspector"]),
@@ -14,6 +15,7 @@ let package = Package(
         .target(name: "BinaryInspector",
                 dependencies: [.product(name: "FoundationExtensions", package: "swift-foundation-extensions")],
                 path: "Sources",
+                resources: [.process("BinaryInspector/Localizable.xcstrings")],
                 swiftSettings: [.swiftLanguageMode(.v6)]),
         .testTarget(name: "BinaryInspectorTests", dependencies: ["BinaryInspector"], path: "Tests"),
     ]

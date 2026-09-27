@@ -87,16 +87,16 @@ public enum BinaryFormat {
         let machine = ByteReader.u16(d, 18, bigEndian: big).map { elfMachine($0) }
         return Info(kind: .elf, bits: is64 ? 64 : 32, endian: big ? .big : .little,
                     arch: machine, type: type,
-                    fields: [Field("Class", is64 ? "ELF64" : "ELF32")])
+                    fields: [Field(String(localized: "Class", bundle: .module, comment: "Binary header detail row: ELF word-size class (ELF32/ELF64)."), is64 ? "ELF64" : "ELF32")])
     }
 
     private static func elfType(_ t: UInt16) -> String {
         switch t {
-        case 1: return "relocatable"
-        case 2: return "executable"
-        case 3: return "shared object"
-        case 4: return "core dump"
-        default: return "type 0x\(String(t, radix: 16))"
+        case 1: return String(localized: "relocatable", bundle: .module, comment: "Binary file type (ELF): a relocatable object file.")
+        case 2: return String(localized: "executable", bundle: .module, comment: "Binary file type: a runnable program.")
+        case 3: return String(localized: "shared object", bundle: .module, comment: "Binary file type (ELF): a shared library.")
+        case 4: return String(localized: "core dump", bundle: .module, comment: "Binary file type: a crashed process memory image.")
+        default: return String(localized: "type 0x\(String(t, radix: 16))", bundle: .module, comment: "Binary file type: an unknown type code, in hex.")
         }
     }
 
@@ -111,7 +111,7 @@ public enum BinaryFormat {
         case 0x3E: return "x86-64"
         case 0xB7: return "AArch64"
         case 0xF3: return "RISC-V"
-        default:   return "machine 0x\(String(m, radix: 16))"
+        default:   return String(localized: "machine 0x\(String(m, radix: 16))", bundle: .module, comment: "Binary architecture: an unknown machine code, in hex.")
         }
     }
 
@@ -130,7 +130,7 @@ public enum BinaryFormat {
         let filetype = ByteReader.u32(d, 12, bigEndian: m.big)
         return Info(kind: .machO, bits: m.is64 ? 64 : 32, endian: m.big ? .big : .little,
                     arch: cpu.map { machoCPU($0) }, type: filetype.map { machoType($0) },
-                    fields: [Field("Magic", m.is64 ? "MH_MAGIC_64" : "MH_MAGIC")])
+                    fields: [Field(String(localized: "Magic", bundle: .module, comment: "Binary header detail row: the Mach-O magic number constant."), m.is64 ? "MH_MAGIC_64" : "MH_MAGIC")])
     }
 
     private static func parseMachOFat(_ d: Data, archCount: UInt32) -> Info {
@@ -141,8 +141,8 @@ public enum BinaryFormat {
             if let cpu = ByteReader.u32(d, 8 + i * 20, bigEndian: true) { arches.append(machoCPU(cpu)) }
         }
         return Info(kind: .machOUniversal, bits: nil, endian: .big, arch: arches.joined(separator: ", "),
-                    type: "universal (\(archCount) slices)",
-                    fields: arches.enumerated().map { Field("Slice \($0.offset)", $0.element) })
+                    type: String(localized: "universal (\(Int(archCount)) slices)", bundle: .module, comment: "Binary file type: a Mach-O universal binary holding this many architecture slices."),
+                    fields: arches.enumerated().map { Field(String(localized: "Slice \($0.offset)", bundle: .module, comment: "Binary header detail row: one architecture slice of a universal binary, numbered from 0."), $0.element) })
     }
 
     private static func machoCPU(_ c: UInt32) -> String {
@@ -153,20 +153,20 @@ public enum BinaryFormat {
         case 0x0100_000C: return "ARM64"
         case 18:         return "PowerPC"
         case 0x0100_0012: return "PowerPC64"
-        default:         return "cpu 0x\(String(c, radix: 16))"
+        default:         return String(localized: "cpu 0x\(String(c, radix: 16))", bundle: .module, comment: "Binary architecture: an unknown CPU type code, in hex.")
         }
     }
 
     private static func machoType(_ t: UInt32) -> String {
         switch t {
-        case 1:  return "object"
-        case 2:  return "executable"
-        case 4:  return "core dump"
-        case 6:  return "dynamic library"
-        case 7:  return "dynamic linker"
-        case 8:  return "bundle"
-        case 10: return "dSYM companion"
-        default: return "type \(t)"
+        case 1:  return String(localized: "object", bundle: .module, comment: "Binary file type (Mach-O): an object file.")
+        case 2:  return String(localized: "executable", bundle: .module, comment: "Binary file type: a runnable program.")
+        case 4:  return String(localized: "core dump", bundle: .module, comment: "Binary file type: a crashed process memory image.")
+        case 6:  return String(localized: "dynamic library", bundle: .module, comment: "Binary file type: a shared library loaded at run time.")
+        case 7:  return String(localized: "dynamic linker", bundle: .module, comment: "Binary file type (Mach-O): the dynamic linker itself.")
+        case 8:  return String(localized: "bundle", bundle: .module, comment: "Binary file type (Mach-O): a loadable plug-in bundle.")
+        case 10: return String(localized: "dSYM companion", bundle: .module, comment: "Binary file type (Mach-O): a debug-symbols companion file.")
+        default: return String(localized: "type \(t)", bundle: .module, comment: "Binary file type: an unknown type code.")
         }
     }
 
@@ -178,15 +178,15 @@ public enum BinaryFormat {
         }
         let pe = Int(lfanew)
         guard ByteReader.matches(d, at: pe, [0x50, 0x45, 0x00, 0x00]) else {
-            return Info(kind: .pe, bits: nil, endian: .little, arch: nil, type: "DOS/MZ (no PE header)", fields: [])
+            return Info(kind: .pe, bits: nil, endian: .little, arch: nil, type: String(localized: "DOS/MZ (no PE header)", bundle: .module, comment: "Binary file type: an old DOS executable without a Windows PE header."), fields: [])
         }
         let machine = ByteReader.u16(d, pe + 4, bigEndian: false)
         let characteristics = ByteReader.u16(d, pe + 22, bigEndian: false) ?? 0
         let isDLL = characteristics & 0x2000 != 0
         let (arch, bits) = machine.map { peMachine($0) } ?? (nil, nil)
         return Info(kind: .pe, bits: bits, endian: .little, arch: arch,
-                    type: isDLL ? "dynamic library" : "executable",
-                    fields: [Field("Characteristics", "0x\(String(characteristics, radix: 16))")])
+                    type: isDLL ? String(localized: "dynamic library", bundle: .module, comment: "Binary file type: a shared library loaded at run time.") : String(localized: "executable", bundle: .module, comment: "Binary file type: a runnable program."),
+                    fields: [Field(String(localized: "Characteristics", bundle: .module, comment: "Binary header detail row: the Windows PE characteristics flags."), "0x\(String(characteristics, radix: 16))")])
     }
 
     private static func peMachine(_ m: UInt16) -> (String?, Int?) {
@@ -196,7 +196,7 @@ public enum BinaryFormat {
         case 0x01C0: return ("ARM", 32)
         case 0xAA64: return ("ARM64", 64)
         case 0x0200: return ("IA-64", 64)
-        default:     return ("machine 0x\(String(m, radix: 16))", nil)
+        default:     return (String(localized: "machine 0x\(String(m, radix: 16))", bundle: .module, comment: "Binary architecture: an unknown machine code, in hex."), nil)
         }
     }
 
@@ -206,13 +206,13 @@ public enum BinaryFormat {
         let major = ByteReader.u16(d, 6, bigEndian: true) ?? 0
         // Class-file major 45 == Java 1.1; each later Java release adds one.
         let java = major >= 45 ? "Java \(major - 44)" : "pre-1.1"
-        return Info(kind: .java, bits: nil, endian: .big, arch: "JVM bytecode", type: "class file",
-                    fields: [Field("Class version", "\(major)"), Field("Target", java)])
+        return Info(kind: .java, bits: nil, endian: .big, arch: String(localized: "JVM bytecode", bundle: .module, comment: "Binary architecture of a Java class file."), type: String(localized: "class file", bundle: .module, comment: "Binary file type: a compiled Java class file."),
+                    fields: [Field(String(localized: "Class version", bundle: .module, comment: "Binary header detail row: a Java class file format version number."), "\(major)"), Field(String(localized: "Target", bundle: .module, comment: "Binary header detail row: the Java release a class file targets."), java)])
     }
 
     private static func parseWASM(_ d: Data) -> Info {
         let version = ByteReader.u32(d, 4, bigEndian: false) ?? 0
-        return Info(kind: .wasm, bits: 32, endian: .little, arch: "WebAssembly", type: "module",
-                    fields: [Field("Version", "\(version)")])
+        return Info(kind: .wasm, bits: 32, endian: .little, arch: "WebAssembly", type: String(localized: "module", bundle: .module, comment: "Binary file type: a WebAssembly module."),
+                    fields: [Field(String(localized: "Version", bundle: .module, comment: "Binary header detail row: the WebAssembly format version."), "\(version)")])
     }
 }
