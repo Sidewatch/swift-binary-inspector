@@ -1,6 +1,6 @@
 # Swift Binary Inspector
 
-A dependency-free toolkit for inspecting binary files: hex/ASCII dumping, magic-byte file-type identification, printable-string extraction, Shannon entropy, byte-pattern search, per-offset scalar decoding, offset-aligned byte diffing, and structural header parsing for the common executable formats (Mach-O, ELF, PE/COFF, Java class, WebAssembly) — plus a piece-table buffer for editing. Pure Foundation, zero dependencies.
+A toolkit for inspecting binary files: hex/ASCII dumping, magic-byte file-type identification, printable-string extraction, Shannon entropy, byte-pattern search, per-offset scalar decoding, offset-aligned byte diffing, and structural header parsing for the common executable formats (Mach-O, ELF, PE/COFF, Java class, WebAssembly) — plus a piece-table buffer for editing. Pure Foundation, zero dependencies.
 
 ### Read-only, except one type
 
@@ -18,7 +18,7 @@ Every inspection type is read-only and never mutates the `Data` it is handed. Th
 - 🔀 **Byte diff** — `BinaryDiff.compare(_:_:)` compares two blobs **offset for offset** and returns maximal differing runs. Deliberately not a resyncing diff: over binary data that heuristic invents alignments (a run of `0x00` matches anything). Unequal lengths are compared over the common prefix, with the tail reported as `lengthDelta` so "this file is longer" is never confused with "these bytes changed"
 - ✏️ **Editing** — `BinaryBuffer` is a piece table: `insert`/`remove`/`replace`/`overwrite` at any offset, with undo/redo. An insert near the start of a large file rearranges a small piece list instead of moving the bytes. `hexRows(bytesPerRow:from:)` reads a window without materializing the document, so a virtualized hex view stays cheap after edits
 - 🛡 **Bounds-checked** — every multi-byte read returns `nil` past the end, so truncated/garbage files are "unrecognized", never a crash
-- 🪶 **Zero dependencies** — Foundation only
+- 🪶 **Small** — Foundation plus swift-foundation-extensions
 - 🍎 **Cross-platform** — iOS, macOS, tvOS, watchOS, visionOS
 
 ## Requirements
