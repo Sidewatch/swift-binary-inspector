@@ -23,11 +23,16 @@ public enum MagicBytes {
     /// An identified type: a human name, the conventional extension/MIME when there is
     /// one, and a coarse category.
     public struct FileType: Equatable, Sendable {
+        /// Human-readable type name (`"PNG image"`).
         public let name: String
+        /// Conventional file extension, without the dot.
         public let ext: String?
+        /// MIME type, when there is a registered one.
         public let mime: String?
+        /// Coarse grouping for icon and tint choices.
         public let category: Category
 
+        /// Creates an identified type.
         public init(name: String, ext: String?, mime: String?, category: Category) {
             self.name = name; self.ext = ext; self.mime = mime; self.category = category
         }

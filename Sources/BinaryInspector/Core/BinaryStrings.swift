@@ -27,8 +27,11 @@ public enum BinaryStrings {
 
     /// A recovered string and the byte offset it begins at.
     public struct Found: Equatable {
+        /// Byte offset of the string's first character.
         public let offset: Int
+        /// The decoded text.
         public let value: String
+        /// Creates a match.
         public init(offset: Int, value: String) { self.offset = offset; self.value = value }
     }
 

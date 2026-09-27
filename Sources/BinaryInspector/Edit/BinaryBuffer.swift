@@ -11,20 +11,12 @@
 
 import Foundation
 
-/// An editable view over a blob, backed by a piece table.
+/// An editable view over a blob, backed by a piece table: the original `Data` is never
+/// mutated, inserted bytes go to an append-only buffer, and edits rearrange a small list of
+/// pieces — so an insert near the start of a 500 MB file costs no memmove.
 ///
-/// Everything else in `BinaryInspector` is read-only and never touches its input. This type
-/// is the deliberate exception, and it still never mutates the `Data` it was handed: the
-/// original stays immutable, inserted bytes accumulate in a separate append-only buffer,
-/// and the document is described by an ordered list of pieces pointing into one or the
-/// other. Editing rearranges that small list, so an insert near the start of a 500 MB file
-/// costs a couple of array operations rather than a 500 MB memmove.
-///
-/// **The invariant that makes undo cheap:** `added` is append-only — bytes are never
-/// removed from it, even when the edit that introduced them is undone. A snapshot of the
-/// piece list is therefore sufficient to restore any prior state exactly, with no byte
-/// copying. The cost is that `added` grows with edit history rather than with live content;
-/// ``compacted()`` rebuilds a fresh buffer when that matters.
+/// Invariant: `added` is append-only, even across undo, so a piece-list snapshot restores any
+/// state exactly. It grows with history, not content; ``compacted()`` rebuilds when that matters.
 public struct BinaryBuffer: Sendable {
 
     /// Which backing store a piece points into.
@@ -32,6 +24,7 @@ public struct BinaryBuffer: Sendable {
 
     /// A contiguous span of one backing store.
     struct Piece: Equatable, Sendable {
+        /// The backing store this span reads from.
         let source: Source
         /// Start offset within the backing store (NOT within the document).
         let start: Int
@@ -81,8 +74,11 @@ public struct BinaryBuffer: Sendable {
     /// the ability to undo past one is a worse surprise than carrying the history.
     public mutating func markSaved() { savedPieces = pieces }
 
+    /// True when the document has no bytes.
     public var isEmpty: Bool { count == 0 }
+    /// True when ``undo()`` has a step to restore.
     public var canUndo: Bool { !undoStack.isEmpty }
+    /// True when ``redo()`` has an undone step to reapply.
     public var canRedo: Bool { !redoStack.isEmpty }
 
     /// Number of pieces currently describing the document. Diagnostic — a proxy for how
@@ -217,6 +213,7 @@ public struct BinaryBuffer: Sendable {
 
     // MARK: - Undo / redo
 
+    /// Restores the state before the last edit. Returns false when there is nothing to undo.
     @discardableResult
     public mutating func undo() -> Bool {
         guard let snapshot = undoStack.popLast() else { return false }
@@ -226,6 +223,7 @@ public struct BinaryBuffer: Sendable {
         return true
     }
 
+    /// Reapplies the last undone edit. Returns false when there is nothing to redo.
     @discardableResult
     public mutating func redo() -> Bool {
         guard let snapshot = redoStack.popLast() else { return false }

@@ -11,11 +11,9 @@
 
 import Foundation
 
-/// Reads the bytes at a single offset back as each common fixed-width scalar type, so a
-/// hex view can show "what is this, interpreted as…" beside the caret. Read-only and
-/// bounds-checked: a type whose span runs past the end comes back `inRange == false` with
-/// a placeholder string rather than being dropped, so the panel's row set never shifts
-/// under the caret as it nears the end of the file.
+/// Reads the bytes at a single offset back as each common fixed-width scalar type, for the
+/// "interpreted as…" panel beside a hex view's caret. A type whose span runs past the end comes
+/// back `inRange == false` with a placeholder, never dropped, so the rows never shift.
 public enum BinaryValues {
 
     /// Byte order used to assemble multi-byte values.
@@ -23,6 +21,7 @@ public enum BinaryValues {
         case little, big
         /// Display name for a segmented control.
         public var label: String { self == .little ? "Little" : "Big" }
+        /// True for big-endian, the flag form the typed readers take.
         var isBig: Bool { self == .big }
     }
 
@@ -37,6 +36,7 @@ public enum BinaryValues {
         /// False when `offset + byteWidth` runs past the end — `text` is a placeholder.
         public let inRange: Bool
 
+        /// Creates one decoded row.
         public init(type: String, text: String, byteWidth: Int, inRange: Bool) {
             self.type = type
             self.text = text
@@ -48,17 +48,11 @@ public enum BinaryValues {
     /// Placeholder shown for an interpretation that runs past the end of the data.
     public static let outOfRange = "—"
 
-    /// Decode the bytes at `offset` as every supported type, in panel order.
+    /// Decodes the bytes at `offset` as every supported type, in panel order.
     ///
-    /// The row set is fixed and never varies with position: 8/16/32/64-bit signed and
-    /// unsigned integers, 32/64-bit floats, then the raw byte as ASCII. That stability is
-    /// deliberate — a panel whose rows appear and disappear as the caret moves is unreadable.
-    ///
-    /// - Parameters:
-    ///   - data: The bytes being inspected.
-    ///   - offset: Byte offset of the caret. Out-of-range offsets yield all-placeholder rows.
-    ///   - endianness: Byte order for the multi-byte types (single-byte types ignore it).
-    /// - Returns: One ``Value`` per supported type, in a stable display order.
+    /// The row set is fixed — 8/16/32/64-bit signed and unsigned integers, 32/64-bit floats,
+    /// then the byte as ASCII — because rows that come and go as the caret moves are unreadable.
+    /// An out-of-range `offset` yields all-placeholder rows; single-byte types ignore `endianness`.
     public static func decode(_ data: Data, at offset: Int, endianness: Endianness = .little) -> [Value] {
         let big = endianness.isBig
         return [
@@ -84,33 +78,41 @@ public enum BinaryValues {
 
     // MARK: - Typed reads (each `nil` when the span runs past the end)
 
+    /// The byte at offset `o`.
     public static func uint8(_ d: Data, _ o: Int) -> UInt8? {
         guard o >= 0, o + 1 <= d.count else { return nil }
         return d[d.startIndex + o]
     }
 
+    /// The byte at offset `o`, signed.
     public static func int8(_ d: Data, _ o: Int) -> Int8? { uint8(d, o).map { Int8(bitPattern: $0) } }
 
+    /// Unsigned 16-bit integer at offset `o`.
     public static func uint16(_ d: Data, _ o: Int, _ bigEndian: Bool) -> UInt16? {
         ByteReader.u16(d, o, bigEndian: bigEndian)
     }
 
+    /// Signed 16-bit integer at offset `o`.
     public static func int16(_ d: Data, _ o: Int, _ bigEndian: Bool) -> Int16? {
         uint16(d, o, bigEndian).map { Int16(bitPattern: $0) }
     }
 
+    /// Unsigned 32-bit integer at offset `o`.
     public static func uint32(_ d: Data, _ o: Int, _ bigEndian: Bool) -> UInt32? {
         ByteReader.u32(d, o, bigEndian: bigEndian)
     }
 
+    /// Signed 32-bit integer at offset `o`.
     public static func int32(_ d: Data, _ o: Int, _ bigEndian: Bool) -> Int32? {
         uint32(d, o, bigEndian).map { Int32(bitPattern: $0) }
     }
 
+    /// Unsigned 64-bit integer at offset `o`.
     public static func uint64(_ d: Data, _ o: Int, _ bigEndian: Bool) -> UInt64? {
         ByteReader.u64(d, o, bigEndian: bigEndian)
     }
 
+    /// Signed 64-bit integer at offset `o`.
     public static func int64(_ d: Data, _ o: Int, _ bigEndian: Bool) -> Int64? {
         uint64(d, o, bigEndian).map { Int64(bitPattern: $0) }
     }
@@ -127,24 +129,18 @@ public enum BinaryValues {
 
     // MARK: - Float formatting
 
-    /// Format a `Float` for the panel. NaN/infinity are named rather than printed as
-    /// `nan`/`inf`, because in binary reverse-engineering hitting one usually means the
-    /// offset or the endianness is wrong, and that should read as a signal not a value.
-    /// Format a `Float` at Float precision.
+    /// Formats a `Float` at Float precision. NaN/infinity are spelled out, since hitting one
+    /// usually means the offset or endianness is wrong.
     ///
-    /// Swift's own `description` is the shortest string that round-trips back to the SAME
-    /// value at that type's precision, and it only reaches for scientific notation at genuine
-    /// extremes. Two bugs came from hand-rolling this with `%g` instead:
-    /// `100.0` rendered as `1e+02` (because `%g` prefers exponents once the exponent exceeds
-    /// the precision), and a `Float` widened to `Double` before formatting printed nine
-    /// digits of conversion noise — `0.1` as `0.100000001`. Widening a Float and asking for
-    /// Double precision shows the error, not the value.
+    /// Must not use `%g` or widen to `Double`: `%g` renders `100.0` as `1e+02`, and widening
+    /// prints conversion noise (`0.1` as `0.100000001`). `description` round-trips exactly.
     static func floatText(_ f: Float) -> String {
         if f.isNaN { return "NaN" }
         if f.isInfinite { return f < 0 ? "-Infinity" : "Infinity" }
         return f.description
     }
 
+    /// Formats a `Double` the same way as ``floatText(_:)``.
     static func doubleText(_ d: Double) -> String {
         if d.isNaN { return "NaN" }
         if d.isInfinite { return d < 0 ? "-Infinity" : "Infinity" }

@@ -23,6 +23,7 @@ public enum HexDump {
         /// The raw bytes on this row (never empty; at most one row's worth).
         public let bytes: [UInt8]
 
+        /// Creates a row starting at `offset`.
         public init(offset: UInt64, bytes: [UInt8]) {
             self.offset = offset
             self.bytes = bytes

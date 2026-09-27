@@ -33,9 +33,13 @@ public enum Entropy {
 
     /// One block's entropy plus where it sits.
     public struct Block: Equatable {
+        /// Byte offset of the block's first byte.
         public let offset: Int
+        /// Bytes in the block; only the last block may be short.
         public let length: Int
+        /// The block's Shannon entropy in bits/byte (`0...8`).
         public let entropy: Double
+        /// Creates a block record.
         public init(offset: Int, length: Int, entropy: Double) {
             self.offset = offset; self.length = length; self.entropy = entropy
         }

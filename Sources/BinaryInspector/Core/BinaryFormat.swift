@@ -33,13 +33,20 @@ public enum BinaryFormat {
     /// `nil` for a format where the field doesn't apply; `fields` carries extra
     /// name/value rows for a details panel.
     public struct Info: Equatable {
+        /// The container format.
         public let kind: Kind
+        /// Word size, 32 or 64.
         public let bits: Int?
+        /// Byte order of the header fields.
         public let endian: Endian?
+        /// CPU architecture name (`"ARM64"`, `"x86-64"`, …).
         public let arch: String?
+        /// Object type (executable, dylib, object file, …).
         public let type: String?
+        /// Extra rows for a details panel.
         public let fields: [Field]
 
+        /// Creates a header summary.
         public init(kind: Kind, bits: Int?, endian: Endian?, arch: String?, type: String?, fields: [Field]) {
             self.kind = kind; self.bits = bits; self.endian = endian
             self.arch = arch; self.type = type; self.fields = fields
@@ -48,8 +55,11 @@ public enum BinaryFormat {
 
     /// A single name/value row for display.
     public struct Field: Equatable {
+        /// The row label.
         public let name: String
+        /// The formatted value.
         public let value: String
+        /// Creates a row.
         public init(_ name: String, _ value: String) { self.name = name; self.value = value }
     }
 

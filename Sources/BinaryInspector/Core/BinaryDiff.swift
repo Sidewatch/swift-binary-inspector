@@ -13,16 +13,10 @@ import Foundation
 
 /// Compares two blobs **offset for offset** and reports maximal runs of differing bytes.
 ///
-/// This is deliberately *not* a resyncing diff. A text diff hunts for matching regions so
-/// an insertion doesn't cascade; over binary data that heuristic reliably invents
-/// alignments that aren't real — a run of `0x00` matches everything. The case this exists
-/// for is two same-shaped records that differ in a few fields (two synth presets saved
-/// either side of one parameter change), where offset-for-offset *is* the truth and any
-/// resync would obscure it.
-///
-/// Files of unequal length are compared over their common prefix; the tail is reported
-/// separately via ``Result/lengthDelta`` rather than being folded into a run, so a caller
-/// can never mistake "this file is longer" for "these bytes changed".
+/// Deliberately not a resyncing diff: over binary data resync invents alignments (a run of
+/// `0x00` matches everything), while two same-shaped records differing in a few fields are
+/// exactly offset-aligned. Unequal lengths compare the common prefix; the tail is reported
+/// via ``Result/lengthDelta``, never folded into a run.
 public enum BinaryDiff {
 
     /// A maximal span of consecutive differing bytes within the compared prefix.
@@ -32,6 +26,7 @@ public enum BinaryDiff {
         /// How many consecutive bytes differ.
         public let length: Int
 
+        /// Creates a run covering `length` bytes from `offset`.
         public init(offset: Int, length: Int) {
             self.offset = offset
             self.length = length
@@ -66,14 +61,10 @@ public enum BinaryDiff {
         public var firstDifference: Int? { runs.first?.offset }
     }
 
-    /// Compare two blobs offset for offset.
+    /// Compares the original `a` with the changed `b` offset for offset.
     ///
-    /// - Parameters:
-    ///   - a: The left/original blob.
-    ///   - b: The right/changed blob.
-    ///   - maxRuns: Stop after this many runs, setting ``Result/truncated``. `nil` (default)
-    ///     reports every run. A cap keeps a pathological pair (two unrelated multi-megabyte
-    ///     files, where nearly every byte differs) from building a vast array a UI can't use.
+    /// - Parameter maxRuns: Stop after this many runs, setting ``Result/truncated``; `nil`
+    ///   reports every run. A cap keeps two unrelated large files from building a vast array.
     /// - Returns: The differing runs plus the length relationship.
     public static func compare(_ a: Data, _ b: Data, maxRuns: Int? = nil) -> Result {
         let common = min(a.count, b.count)
