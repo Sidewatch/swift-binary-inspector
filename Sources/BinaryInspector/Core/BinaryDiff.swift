@@ -90,11 +90,12 @@ public enum BinaryDiff {
             }
         }
 
-        return Result(runs: runs,
-                      differingBytes: differing,
-                      comparedLength: common,
-                      lengthDelta: b.count - a.count,
-                      truncated: truncated)
+        return Result(
+            runs: runs,
+            differingBytes: differing,
+            comparedLength: common,
+            lengthDelta: b.count - a.count,
+            truncated: truncated)
     }
 
     /// Offset of the first differing byte at or after `from`, within the common prefix.

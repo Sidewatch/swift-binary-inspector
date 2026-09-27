@@ -37,15 +37,17 @@ final class BinaryDiffSummaryTests: XCTestCase {
 
     func testCappedListIsSaid() {
         let r = result(runs: [BinaryDiff.Run(offset: 0, length: 1)], differing: 1, delta: 1, truncated: true)
-        XCTAssertEqual(r.summary(filename: "a.bin", compareName: "b.bin"),
-                       "b.bin: 1 run, 1 byte differ · b.bin is 1 B longer · list capped — more differences follow")
+        XCTAssertEqual(
+            r.summary(filename: "a.bin", compareName: "b.bin"),
+            "b.bin: 1 run, 1 byte differ · b.bin is 1 B longer · list capped — more differences follow")
     }
 
     func testRunPreview() {
         let mine = Data([0x00, 0x01, 0x02, 0x03]), theirs = Data([0xff, 0xfe, 0x02, 0x03])
         XCTAssertEqual(BinaryDiff.Run(offset: 0, length: 2).preview(in: mine, against: theirs), "00 01  →  ff fe")
         XCTAssertEqual(BinaryDiff.Run(offset: 1, length: 3).preview(in: mine, against: theirs, showing: 2), "01 02…  →  fe 02…")
-        XCTAssertEqual(BinaryDiff.Run(offset: 3, length: 4).preview(in: mine, against: Data([0xaa])), "03  →  —", "a side with no bytes there")
+        XCTAssertEqual(
+            BinaryDiff.Run(offset: 3, length: 4).preview(in: mine, against: Data([0xaa])), "03  →  —", "a side with no bytes there")
         XCTAssertEqual(BinaryDiff.Run(offset: 0, length: 2).preview(in: mine, against: nil), "", "nothing to compare against")
     }
 }

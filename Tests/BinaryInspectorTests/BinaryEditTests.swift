@@ -61,7 +61,7 @@ final class BinaryEditTests: XCTestCase {
     }
 
     func testValuesOutOfRangeKeepsRowSetStable() {
-        let d = Data([0x41, 0x42])                       // only 2 bytes
+        let d = Data([0x41, 0x42])  // only 2 bytes
         let rows = BinaryValues.decode(d, at: 0)
         // Row set is fixed regardless of how little data is left.
         XCTAssertEqual(rows.count, 11)
@@ -135,7 +135,7 @@ final class BinaryEditTests: XCTestCase {
         XCTAssertEqual(r.differingBytes, 1)
         XCTAssertEqual(r.firstDifference, 10)
         XCTAssertFalse(r.identical)
-        a[10] = 0xFF                                     // converge → identical
+        a[10] = 0xFF  // converge → identical
         XCTAssertTrue(BinaryDiff.compare(a, b).identical)
     }
 
@@ -143,10 +143,14 @@ final class BinaryEditTests: XCTestCase {
         var a = Data(repeating: 0, count: 32)
         var b = a
         for i in 5..<9 { b[i] = 0xAA }
-        a[20] = 1; b[20] = 2                             // a second, separate run
+        a[20] = 1; b[20] = 2  // a second, separate run
         let r = BinaryDiff.compare(a, b)
-        XCTAssertEqual(r.runs, [BinaryDiff.Run(offset: 5, length: 4),
-                                BinaryDiff.Run(offset: 20, length: 1)])
+        XCTAssertEqual(
+            r.runs,
+            [
+                BinaryDiff.Run(offset: 5, length: 4),
+                BinaryDiff.Run(offset: 20, length: 1),
+            ])
         XCTAssertEqual(r.differingBytes, 5)
         XCTAssertEqual(r.runs[0].end, 9)
         XCTAssertEqual(r.runs[0].range, 5..<9)
@@ -158,16 +162,16 @@ final class BinaryEditTests: XCTestCase {
         let a = Data(repeating: 0x11, count: 16)
         let b = Data(repeating: 0x11, count: 24)
         let r = BinaryDiff.compare(a, b)
-        XCTAssertTrue(r.runs.isEmpty)                    // common prefix matches
+        XCTAssertTrue(r.runs.isEmpty)  // common prefix matches
         XCTAssertEqual(r.comparedLength, 16)
         XCTAssertEqual(r.lengthDelta, 8)
-        XCTAssertFalse(r.identical)                      // still not the same file
+        XCTAssertFalse(r.identical)  // still not the same file
     }
 
     func testDiffTruncationIsHonest() {
         var a = Data(repeating: 0, count: 100)
         var b = a
-        for i in stride(from: 0, to: 100, by: 10) { b[i] = 0xFF }   // 10 separate runs
+        for i in stride(from: 0, to: 100, by: 10) { b[i] = 0xFF }  // 10 separate runs
         let capped = BinaryDiff.compare(a, b, maxRuns: 3)
         XCTAssertEqual(capped.runs.count, 3)
         XCTAssertTrue(capped.truncated)
@@ -214,7 +218,7 @@ final class BinaryEditTests: XCTestCase {
         XCTAssertEqual(b.data(), Data([1, 9, 2, 3]))
         b.insert([0], at: 0)
         XCTAssertEqual(b.data(), Data([0, 1, 9, 2, 3]))
-        b.insert([7], at: b.count)                       // append
+        b.insert([7], at: b.count)  // append
         XCTAssertEqual(b.data(), Data([0, 1, 9, 2, 3, 7]))
         XCTAssertTrue(b.isModified)
     }
@@ -299,11 +303,11 @@ final class BinaryEditTests: XCTestCase {
 
     func testBufferClampsOutOfRangeOffsets() {
         var b = BinaryBuffer(Data([1, 2, 3]))
-        b.insert([9], at: 999)                           // clamps to end
+        b.insert([9], at: 999)  // clamps to end
         XCTAssertEqual(b.data(), Data([1, 2, 3, 9]))
-        b.remove(-5..<1)                                 // clamps to 0..<1
+        b.remove(-5..<1)  // clamps to 0..<1
         XCTAssertEqual(b.data(), Data([2, 3, 9]))
-        b.remove(100..<200)                              // entirely past end → no-op
+        b.remove(100..<200)  // entirely past end → no-op
         XCTAssertEqual(b.data(), Data([2, 3, 9]))
     }
 
@@ -391,18 +395,22 @@ final class BinaryEditTests: XCTestCase {
                     reference.replaceSubrange(lo..<hi, with: new)
                 }
 
-                XCTAssertEqual(Array(buffer.data()), reference,
-                               "seed \(seed) step \(step): content diverged")
-                XCTAssertEqual(buffer.count, reference.count,
-                               "seed \(seed) step \(step): count diverged")
+                XCTAssertEqual(
+                    Array(buffer.data()), reference,
+                    "seed \(seed) step \(step): content diverged")
+                XCTAssertEqual(
+                    buffer.count, reference.count,
+                    "seed \(seed) step \(step): count diverged")
                 if !reference.isEmpty {
                     let probe = Int.random(in: 0..<reference.count, using: &rng)
-                    XCTAssertEqual(buffer.byte(at: probe), reference[probe],
-                                   "seed \(seed) step \(step): byte(at:) diverged at \(probe)")
+                    XCTAssertEqual(
+                        buffer.byte(at: probe), reference[probe],
+                        "seed \(seed) step \(step): byte(at:) diverged at \(probe)")
                     let lo = Int.random(in: 0..<reference.count, using: &rng)
                     let hi = Int.random(in: lo...reference.count, using: &rng)
-                    XCTAssertEqual(buffer.bytes(in: lo..<hi), Array(reference[lo..<hi]),
-                                   "seed \(seed) step \(step): bytes(in:) diverged over \(lo)..<\(hi)")
+                    XCTAssertEqual(
+                        buffer.bytes(in: lo..<hi), Array(reference[lo..<hi]),
+                        "seed \(seed) step \(step): bytes(in:) diverged over \(lo)..<\(hi)")
                 }
                 states.append(reference)
             }

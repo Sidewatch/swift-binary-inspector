@@ -56,17 +56,17 @@ public enum BinaryValues {
     public static func decode(_ data: Data, at offset: Int, endianness: Endianness = .little) -> [Value] {
         let big = endianness.isBig
         return [
-            value("Int8",    int8(data, offset).map(String.init),            1, data, offset),
-            value("UInt8",   uint8(data, offset).map(String.init),           1, data, offset),
-            value("Int16",   int16(data, offset, big).map(String.init),      2, data, offset),
-            value("UInt16",  uint16(data, offset, big).map(String.init),     2, data, offset),
-            value("Int32",   int32(data, offset, big).map(String.init),      4, data, offset),
-            value("UInt32",  uint32(data, offset, big).map(String.init),     4, data, offset),
-            value("Int64",   int64(data, offset, big).map(String.init),      8, data, offset),
-            value("UInt64",  uint64(data, offset, big).map(String.init),     8, data, offset),
-            value("Float32", float32(data, offset, big).map(floatText),      4, data, offset),
-            value("Float64", float64(data, offset, big).map(doubleText),     8, data, offset),
-            value("ASCII",   uint8(data, offset).map { String(HexDump.printableASCII($0)) }, 1, data, offset),
+            value("Int8", int8(data, offset).map(String.init), 1, data, offset),
+            value("UInt8", uint8(data, offset).map(String.init), 1, data, offset),
+            value("Int16", int16(data, offset, big).map(String.init), 2, data, offset),
+            value("UInt16", uint16(data, offset, big).map(String.init), 2, data, offset),
+            value("Int32", int32(data, offset, big).map(String.init), 4, data, offset),
+            value("UInt32", uint32(data, offset, big).map(String.init), 4, data, offset),
+            value("Int64", int64(data, offset, big).map(String.init), 8, data, offset),
+            value("UInt64", uint64(data, offset, big).map(String.init), 8, data, offset),
+            value("Float32", float32(data, offset, big).map(floatText), 4, data, offset),
+            value("Float64", float64(data, offset, big).map(doubleText), 8, data, offset),
+            value("ASCII", uint8(data, offset).map { String(HexDump.printableASCII($0)) }, 1, data, offset),
         ]
     }
 

@@ -6,17 +6,18 @@ let package = Package(
     defaultLocalization: "en",
     platforms: [.macOS(.v14)],
     products: [
-        .library(name: "BinaryInspector", targets: ["BinaryInspector"]),
+        .library(name: "BinaryInspector", targets: ["BinaryInspector"])
     ],
     dependencies: [
-        .package(path: "../swift-foundation-extensions"),
+        .package(path: "../swift-foundation-extensions")
     ],
     targets: [
-        .target(name: "BinaryInspector",
-                dependencies: [.product(name: "FoundationExtensions", package: "swift-foundation-extensions")],
-                path: "Sources",
-                resources: [.process("BinaryInspector/Localizable.xcstrings")],
-                swiftSettings: [.swiftLanguageMode(.v6)]),
+        .target(
+            name: "BinaryInspector",
+            dependencies: [.product(name: "FoundationExtensions", package: "swift-foundation-extensions")],
+            path: "Sources",
+            resources: [.process("BinaryInspector/Localizable.xcstrings")],
+            swiftSettings: [.swiftLanguageMode(.v6)]),
         .testTarget(name: "BinaryInspectorTests", dependencies: ["BinaryInspector"], path: "Tests"),
     ]
 )

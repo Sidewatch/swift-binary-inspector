@@ -36,6 +36,9 @@ flat. Tests mirror the module: `Tests/<Module>Tests/<Type>Tests.swift`.
   through thin `Extensions/` where that reads better.
 - **Swift 6 language mode, tools 6.2, macOS 14+.** No `unsafeFlags` in `Package.swift`: they make
   the package unusable as a URL dependency.
+- **Formatted by `swift format`** with the checked-in `.swift-format` (4-space indent, 140 columns,
+  layout only — no rule that rewrites code). Run `swift format format -i -r Sources Tests Package.swift`
+  before a PR; `swift format lint --strict -r Sources Tests Package.swift` must print nothing.
 - **Public API is documented** with `///`. Anything not needed outside the module is `internal`.
 - **Tests are mutation-verified.** A new test must FAIL against the code before your change,
   then pass with it. Name the mutant you checked in the PR.

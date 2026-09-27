@@ -97,7 +97,7 @@ public struct BinaryBuffer: Sendable {
                 let inner = p.start + (offset - pos)
                 switch p.source {
                 case .original: return original[original.startIndex + inner]
-                case .added:    return added[inner]
+                case .added: return added[inner]
                 }
             }
             pos = end
@@ -250,7 +250,7 @@ public struct BinaryBuffer: Sendable {
     private mutating func pushUndo() {
         undoStack.append(Snapshot(pieces: pieces, count: count))
         if undoStack.count > undoLimit { undoStack.removeFirst(undoStack.count - undoLimit) }
-        redoStack.removeAll()   // a new edit invalidates the redo branch
+        redoStack.removeAll()  // a new edit invalidates the redo branch
     }
 
     /// Insert without touching the undo stack — the shared body of the public mutators.

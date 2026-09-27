@@ -45,7 +45,7 @@ public enum BinaryStrings {
     public static func extract(from data: Data, minLength: Int = 4, encoding: Encoding = .ascii) -> [Found] {
         let minLen = max(1, minLength)
         switch encoding {
-        case .ascii:   return scanASCII(data, minLen: minLen)
+        case .ascii: return scanASCII(data, minLen: minLen)
         case .utf16LE: return scanUTF16(data, minLen: minLen, bigEndian: false)
         case .utf16BE: return scanUTF16(data, minLen: minLen, bigEndian: true)
         }

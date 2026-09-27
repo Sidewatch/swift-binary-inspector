@@ -25,16 +25,16 @@ final class BinaryInspectorTests: XCTestCase {
         XCTAssertEqual(rows[0].offset, 0)
         XCTAssertEqual(rows[0].bytes.count, 16)
         XCTAssertEqual(rows[1].offset, 16)
-        XCTAssertEqual(rows[1].bytes.count, 4)          // short final row
+        XCTAssertEqual(rows[1].bytes.count, 4)  // short final row
         XCTAssertEqual(rows[0].offsetColumn, "00000000")
         XCTAssertEqual(rows[0].hexBytes[0], "00")
         XCTAssertEqual(rows[0].hexBytes[15], "0f")
     }
 
     func testHexDumpAsciiGutter() {
-        let data = Data("Hi\u{01}!".utf8)               // printable, control, printable
+        let data = Data("Hi\u{01}!".utf8)  // printable, control, printable
         let row = HexDump.rows(of: data)[0]
-        XCTAssertEqual(row.asciiColumn, "Hi.!")         // control byte → '.'
+        XCTAssertEqual(row.asciiColumn, "Hi.!")  // control byte → '.'
     }
 
     func testHexDumpWindow() {
@@ -48,7 +48,7 @@ final class BinaryInspectorTests: XCTestCase {
     func testHexDumpRenderAligns() {
         let out = HexDump.render(Data([0xDE, 0xAD]), bytesPerRow: 4)
         XCTAssertTrue(out.hasPrefix("00000000  de ad"), out)
-        XCTAssertTrue(out.hasSuffix("|..|"), out)       // 0xDE/0xAD not printable
+        XCTAssertTrue(out.hasSuffix("|..|"), out)  // 0xDE/0xAD not printable
     }
 
     // Regression: rows/render subscripted with zero-based positions, trapping on a
@@ -59,7 +59,7 @@ final class BinaryInspectorTests: XCTestCase {
         XCTAssertEqual(slice.startIndex, 16)
         let rows = HexDump.rows(of: slice, bytesPerRow: 16)
         XCTAssertEqual(rows.count, 3)
-        XCTAssertEqual(rows[0].offset, 0)               // offsets are within the slice
+        XCTAssertEqual(rows[0].offset, 0)  // offsets are within the slice
         XCTAssertEqual(rows[0].bytes, Array(16..<32).map { UInt8($0) })
         XCTAssertEqual(rows[2].bytes, Array(48..<64).map { UInt8($0) })
         XCTAssertTrue(HexDump.render(slice).hasPrefix("00000000  10 11"), HexDump.render(slice))
@@ -110,7 +110,7 @@ final class BinaryInspectorTests: XCTestCase {
         var data = Data([0x00, 0x01])
         data.append(Data("hello".utf8))
         data.append(Data([0x00]))
-        data.append(Data("hi".utf8))                    // too short at minLength 4
+        data.append(Data("hi".utf8))  // too short at minLength 4
         let found = BinaryStrings.extract(from: data, minLength: 4)
         XCTAssertEqual(found.count, 1)
         XCTAssertEqual(found[0].value, "hello")
@@ -153,9 +153,9 @@ final class BinaryInspectorTests: XCTestCase {
     func testSearchHex() {
         let data = Data([0xFF, 0xD8, 0xFF, 0x00, 0xFF, 0xD8])
         XCTAssertEqual(ByteSearch.findHex("ffd8", in: data), [0, 4])
-        XCTAssertEqual(ByteSearch.findHex("FF D8", in: data), [0, 4])   // spaces + case
-        XCTAssertNil(ByteSearch.findHex("fff", in: data))               // odd digits
-        XCTAssertNil(ByteSearch.findHex("gg", in: data))                // non-hex
+        XCTAssertEqual(ByteSearch.findHex("FF D8", in: data), [0, 4])  // spaces + case
+        XCTAssertNil(ByteSearch.findHex("fff", in: data))  // odd digits
+        XCTAssertNil(ByteSearch.findHex("gg", in: data))  // non-hex
     }
 
     func testParseHex() {
@@ -166,10 +166,12 @@ final class BinaryInspectorTests: XCTestCase {
     // MARK: - BinaryFormat
 
     func testFormatELF() {
-        let elf = Data([0x7F, 0x45, 0x4C, 0x46, 0x02, 0x01, 0x01, 0x00,
-                        0, 0, 0, 0, 0, 0, 0, 0,
-                        0x02, 0x00,          // e_type = EXEC (LE)
-                        0x3E, 0x00])         // e_machine = x86-64 (LE)
+        let elf = Data([
+            0x7F, 0x45, 0x4C, 0x46, 0x02, 0x01, 0x01, 0x00,
+            0, 0, 0, 0, 0, 0, 0, 0,
+            0x02, 0x00,  // e_type = EXEC (LE)
+            0x3E, 0x00,
+        ])  // e_machine = x86-64 (LE)
         let info = BinaryFormat.parse(elf)
         XCTAssertEqual(info?.kind, .elf)
         XCTAssertEqual(info?.bits, 64)
@@ -180,8 +182,10 @@ final class BinaryInspectorTests: XCTestCase {
 
     func testFormatMachO64() {
         // CF FA ED FE (64-bit LE), cputype 0x0100000C (arm64), filetype 2 (EXECUTE)
-        let macho = Data([0xCF, 0xFA, 0xED, 0xFE, 0x0C, 0x00, 0x00, 0x01,
-                          0, 0, 0, 0, 0x02, 0x00, 0x00, 0x00])
+        let macho = Data([
+            0xCF, 0xFA, 0xED, 0xFE, 0x0C, 0x00, 0x00, 0x01,
+            0, 0, 0, 0, 0x02, 0x00, 0x00, 0x00,
+        ])
         let info = BinaryFormat.parse(macho)
         XCTAssertEqual(info?.kind, .machO)
         XCTAssertEqual(info?.bits, 64)
@@ -191,8 +195,8 @@ final class BinaryInspectorTests: XCTestCase {
 
     func testFormatMachOFat() {
         var fat = Data([0xCA, 0xFE, 0xBA, 0xBE, 0, 0, 0, 2])
-        fat.append(Data([0x01, 0x00, 0x00, 0x0C] + [UInt8](repeating: 0, count: 16)))   // arm64 slice
-        fat.append(Data([0x01, 0x00, 0x00, 0x07] + [UInt8](repeating: 0, count: 16)))   // x86-64 slice
+        fat.append(Data([0x01, 0x00, 0x00, 0x0C] + [UInt8](repeating: 0, count: 16)))  // arm64 slice
+        fat.append(Data([0x01, 0x00, 0x00, 0x07] + [UInt8](repeating: 0, count: 16)))  // x86-64 slice
         let info = BinaryFormat.parse(fat)
         XCTAssertEqual(info?.kind, .machOUniversal)
         XCTAssertEqual(info?.arch, "ARM64, x86-64")
@@ -200,11 +204,11 @@ final class BinaryInspectorTests: XCTestCase {
 
     func testFormatPE() {
         var pe = Data(count: 0x58)
-        pe.replaceSubrange(0..<2, with: [0x4D, 0x5A])                       // MZ
-        pe.replaceSubrange(0x3C..<0x40, with: [0x40, 0, 0, 0])              // e_lfanew = 0x40
-        pe.replaceSubrange(0x40..<0x44, with: [0x50, 0x45, 0, 0])           // "PE\0\0"
-        pe.replaceSubrange(0x44..<0x46, with: [0x64, 0x86])                 // machine x86-64
-        pe.replaceSubrange(0x56..<0x58, with: [0x02, 0x00])                 // characteristics (exe, not DLL)
+        pe.replaceSubrange(0..<2, with: [0x4D, 0x5A])  // MZ
+        pe.replaceSubrange(0x3C..<0x40, with: [0x40, 0, 0, 0])  // e_lfanew = 0x40
+        pe.replaceSubrange(0x40..<0x44, with: [0x50, 0x45, 0, 0])  // "PE\0\0"
+        pe.replaceSubrange(0x44..<0x46, with: [0x64, 0x86])  // machine x86-64
+        pe.replaceSubrange(0x56..<0x58, with: [0x02, 0x00])  // characteristics (exe, not DLL)
         let info = BinaryFormat.parse(pe)
         XCTAssertEqual(info?.kind, .pe)
         XCTAssertEqual(info?.arch, "x86-64")

@@ -76,7 +76,7 @@ public enum HexDump {
         let width = max(1, bytesPerRow)
         return rows(of: data, bytesPerRow: width, from: from, length: length).map { row in
             var hex = row.hexBytes.joined(separator: " ")
-            let full = width * 3 - 1   // "ff" * width + (width-1) spaces
+            let full = width * 3 - 1  // "ff" * width + (width-1) spaces
             if hex.count < full { hex += String(repeating: " ", count: full - hex.count) }
             return "\(row.offsetColumn)  \(hex)  |\(row.asciiColumn)|"
         }.joined(separator: "\n")

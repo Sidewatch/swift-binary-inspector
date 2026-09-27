@@ -60,7 +60,8 @@ public enum Entropy {
         var i = 0
         while i < data.count {
             let end = min(i + size, data.count)
-            out.append(Block(offset: i, length: end - i, entropy: shannon(data.subdata(in: (data.startIndex + i)..<(data.startIndex + end)))))
+            out.append(
+                Block(offset: i, length: end - i, entropy: shannon(data.subdata(in: (data.startIndex + i)..<(data.startIndex + end)))))
             i = end
         }
         return out
