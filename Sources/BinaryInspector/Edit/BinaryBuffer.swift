@@ -233,13 +233,6 @@ public struct BinaryBuffer: Sendable {
         return true
     }
 
-    /// Drop all history, keeping the current content. Use after a save, when the prior
-    /// states are no longer reachable anyway.
-    public mutating func clearHistory() {
-        undoStack.removeAll()
-        redoStack.removeAll()
-    }
-
     /// A fresh buffer over the current content, with no history and a single piece —
     /// releasing the original blob and the accumulated add-buffer. Worth doing after a save
     /// of a heavily-edited large file.
