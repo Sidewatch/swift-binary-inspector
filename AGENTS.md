@@ -10,6 +10,7 @@ A dependency-free toolkit for inspecting binary files: hex/ASCII dumping, magic-
 
 - `Core/` — the engine: BinaryDiff, BinaryDiff+Summary, BinaryFormat, BinaryStrings, BinaryValues, ByteReader, ByteSearch, Entropy, HexDump, MagicBytes
 - `Edit/` — the engine: edit: BinaryBuffer
+- `Support/` — ByteOffset (`parse`: a Go to Offset entry, always hexadecimal; only a LEADING `0x` is a prefix, so `10x0` is refused, never read as `0x10`)
 
 ## Rules
 
