@@ -25,7 +25,9 @@ final class BinaryDiffSummaryTests: XCTestCase {
 
     func testRunsAndBytes() {
         let r = result(runs: [BinaryDiff.Run(offset: 0, length: 1)], differing: 1)
-        XCTAssertEqual(r.summary(filename: "a.bin", compareName: "b.bin"), "b.bin: 1 run, 1 byte differ")
+        XCTAssertEqual(r.summary(filename: "a.bin", compareName: "b.bin"), "b.bin: 1 run, 1 byte differs")
+        let oneRunTwoBytes = result(runs: [BinaryDiff.Run(offset: 0, length: 2)], differing: 2)
+        XCTAssertEqual(oneRunTwoBytes.summary(filename: "a.bin", compareName: "b.bin"), "b.bin: 1 run, 2 bytes differ")
         let many = result(runs: Array(repeating: BinaryDiff.Run(offset: 0, length: 2), count: 3), differing: 17)
         XCTAssertEqual(many.summary(filename: "a.bin", compareName: "b.bin"), "b.bin: 3 runs, 17 bytes differ")
     }
@@ -39,7 +41,7 @@ final class BinaryDiffSummaryTests: XCTestCase {
         let r = result(runs: [BinaryDiff.Run(offset: 0, length: 1)], differing: 1, delta: 1, truncated: true)
         XCTAssertEqual(
             r.summary(filename: "a.bin", compareName: "b.bin"),
-            "b.bin: 1 run, 1 byte differ · b.bin is 1 B longer · list capped — more differences follow")
+            "b.bin: 1 run, 1 byte differs · b.bin is 1 B longer · list capped — more differences follow")
     }
 
     func testRunPreview() {

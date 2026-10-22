@@ -172,10 +172,10 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%#@runs@, %#@bytes@ differ"
+            "value" : "%#@r@, %#@b@"
           },
           "substitutions" : {
-            "bytes" : {
+            "b" : {
               "argNum" : 2,
               "formatSpecifier" : "lld",
               "variations" : {
@@ -183,19 +183,19 @@
                   "one" : {
                     "stringUnit" : {
                       "state" : "translated",
-                      "value" : "%arg byte"
+                      "value" : "%arg byte differs"
                     }
                   },
                   "other" : {
                     "stringUnit" : {
                       "state" : "translated",
-                      "value" : "%arg bytes"
+                      "value" : "%arg bytes differ"
                     }
                   }
                 }
               }
             },
-            "runs" : {
+            "r" : {
               "argNum" : 1,
               "formatSpecifier" : "lld",
               "variations" : {
