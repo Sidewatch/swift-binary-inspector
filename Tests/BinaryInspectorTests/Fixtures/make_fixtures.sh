@@ -45,5 +45,33 @@ clang -Os -arch arm64 -mmacosx-version-min=12.0 -bundle plugin.c -o plugin.bundl
 # plugin.o: MH_OBJECT, one unnamed segment, no LC_MAIN or signature.
 clang -Os -arch arm64 -mmacosx-version-min=12.0 -c plugin.c -o plugin.o
 
-cp hello-arm64 hello-x86_64 hello-universal hello-universal-fat64 libgreeter.dylib plugin.bundle plugin.o "$out"/
+# 32-bit images: hello for watchOS arm64_32 (a LINKED 32-bit executable: MH_MAGIC, LC_SEGMENT and
+# 32-bit nlist), and i386 / armv7 objects (current linkers refuse to link either, but clang still
+# compiles them).
+xcrun --sdk watchos clang -Os -arch arm64_32 -mwatchos-version-min=8.0 hello.c -o hello-arm64_32
+clang -Os -arch i386 -mmacosx-version-min=10.13 -c plugin.c -o plugin-i386.o
+clang -Os -target armv7-apple-ios10.0 -isysroot "$(xcrun --sdk iphoneos --show-sdk-path)" -c plugin.c -o plugin-armv7.o
+
+# Encryption: an iOS executable linked -encryptable carries LC_ENCRYPTION_INFO_64 with cryptid 0.
+# hello-ios-encrypted is the same file with cryptid set to 1, as FairPlay leaves an App Store
+# binary (only Apple's servers encrypt; its code signature no longer matches, which is fine here).
+xcrun --sdk iphoneos clang -Os -arch arm64 -miphoneos-version-min=15.0 hello.c -o hello-ios -Wl,-encryptable
+python3 - hello-ios hello-ios-encrypted <<'PY'
+import struct, sys
+data = bytearray(open(sys.argv[1], "rb").read())
+ncmds = struct.unpack_from("<I", data, 16)[0]
+offset = 32  # mach_header_64
+for _ in range(ncmds):
+    cmd, size = struct.unpack_from("<II", data, offset)
+    if cmd == 0x2C:  # LC_ENCRYPTION_INFO_64: cryptoff, cryptsize, cryptid
+        struct.pack_into("<I", data, offset + 16, 1)
+        break
+    offset += size
+else:
+    sys.exit("no LC_ENCRYPTION_INFO_64")
+open(sys.argv[2], "wb").write(data)
+PY
+
+cp hello-arm64 hello-x86_64 hello-universal hello-universal-fat64 libgreeter.dylib plugin.bundle plugin.o \
+    hello-arm64_32 plugin-i386.o plugin-armv7.o hello-ios hello-ios-encrypted "$out"/
 ls -l "$out"

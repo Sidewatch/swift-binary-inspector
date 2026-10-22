@@ -336,6 +336,86 @@ final class MachOParserTests: XCTestCase {
         XCTAssertEqual(symbols.map(\.sectionNumber), [1, 2, 1])
     }
 
+    // MARK: - 32-bit images (real compiler and linker output)
+
+    func testWatchArm64_32ExecutableIsALinked32BitImage() throws {
+        let (data, image) = try thinImage("hello-arm64_32")
+        XCTAssertFalse(image.is64Bit, "MH_MAGIC: the 32-bit header, LC_SEGMENT and 32-bit nlist")
+        XCTAssertFalse(image.isBigEndian)
+        XCTAssertEqual(image.cpuType, 0x0200_000C)
+        XCTAssertEqual(image.cpuSubtype, 1)
+        XCTAssertEqual(image.architectureName, "arm64_32")
+        XCTAssertEqual(image.fileType, 2)
+        XCTAssertEqual(image.commandCount, 18)
+        XCTAssertEqual(image.commandsSize, 1120)
+        XCTAssertEqual(image.flags, 0x0020_0085)
+        XCTAssertEqual(image.loadCommands.filter { $0.command == 0x1 }.count, 5, "five LC_SEGMENT, not LC_SEGMENT_64")
+        XCTAssertEqual(image.segments.map(\.name), ["__PAGEZERO", "__TEXT", "__DATA_CONST", "__DATA", "__LINKEDIT"])
+        XCTAssertEqual(image.segments.map(\.vmAddress), [0, 0x4000, 0xC000, 0x10000, 0x24000])
+        XCTAssertEqual(image.segments.map(\.vmSize), [0x4000, 0x8000, 0x4000, 0x14000, 0x4000])
+        XCTAssertEqual(image.segments.map(\.fileOffset), [0, 0, 32768, 49152, 65536])
+        XCTAssertEqual(image.segments.map(\.fileSize), [0, 32768, 16384, 16384, 328])
+        XCTAssertEqual(image.buildVersions.first?.platform, 4, "watchOS")
+        XCTAssertEqual(image.buildVersions.first?.minimumOS.description, "8.0.0")
+        let symbols = MachOParser.symbols(in: data, image: image).symbols
+        XCTAssertEqual(symbols.count, 6)
+        let byName = Dictionary(symbols.compactMap { s in s.name.map { ($0, s.value) } }, uniquingKeysWith: { a, _ in a })
+        XCTAssertEqual(byName["_main"], 0x8000)
+        XCTAssertEqual(byName["_twice"], 0x8060)
+        XCTAssertEqual(byName["_counter"], 0x10000)
+        XCTAssertEqual(byName["_scratch"], 0x10010)
+        XCTAssertEqual(byName["__mh_execute_header"], 0x4000)
+        XCTAssertEqual(symbols.first { $0.name == "_printf" }?.kind, .undefined)
+        // A 32-bit address maps through the 32-bit segments: _main's bytes, and none for zero-fill.
+        XCTAssertEqual(image.fileOffset(forAddress: 0x8000), 0x4000)
+        XCTAssertNil(image.fileOffset(forAddress: 0x20000), "past __DATA's file-backed part")
+    }
+
+    func testI386AndArmv7ObjectsAre32Bit() throws {
+        let (_, i386) = try thinImage("plugin-i386.o")
+        XCTAssertFalse(i386.is64Bit)
+        XCTAssertEqual(i386.cpuType, 7)
+        XCTAssertEqual(i386.cpuSubtype, 3)
+        XCTAssertEqual(i386.architectureName, "i386")
+        XCTAssertEqual(i386.fileType, 1)
+        XCTAssertEqual(i386.commandCount, 4)
+        XCTAssertEqual(i386.commandsSize, 380)
+        let i386Sections = try XCTUnwrap(i386.segments.first?.sections)
+        XCTAssertEqual(i386Sections.map(\.name), ["__text", "__compact_unwind", "__eh_frame"])
+        XCTAssertEqual(i386Sections.map(\.address), [0, 0xC, 0x20])
+        XCTAssertEqual(i386Sections.map(\.size), [0xA, 0x14, 0x34])
+        XCTAssertEqual(i386Sections.map(\.fileOffset), [408, 420, 440])
+
+        let (_, armv7) = try thinImage("plugin-armv7.o")
+        XCTAssertFalse(armv7.is64Bit)
+        XCTAssertEqual(armv7.cpuType, 12)
+        XCTAssertEqual(armv7.cpuSubtype, 9)
+        XCTAssertEqual(armv7.architectureName, "armv7")
+        XCTAssertEqual(armv7.commandsSize, 244)
+        let armSections = try XCTUnwrap(armv7.segments.first?.sections)
+        XCTAssertEqual(armSections.map(\.name), ["__text"])
+        XCTAssertEqual(armSections.map(\.size), [4])
+        XCTAssertEqual(armSections.map(\.fileOffset), [272])
+    }
+
+    // MARK: - Encryption (a real LC_ENCRYPTION_INFO_64 from the linker)
+
+    func testEncryptionInfoFromTheLinkerAndAsFairPlayLeavesIt() throws {
+        let (_, linked) = try thinImage("hello-ios")
+        let info = try XCTUnwrap(linked.encryption, "-encryptable adds LC_ENCRYPTION_INFO_64")
+        XCTAssertEqual(info.fileOffset, 16384)
+        XCTAssertEqual(info.size, 16384)
+        XCTAssertEqual(info.cryptID, 0)
+        XCTAssertFalse(info.isEncrypted)
+        XCTAssertEqual(linked.buildVersions.first?.platform, 2, "iOS")
+        XCTAssertEqual(linked.buildVersions.first?.minimumOS.description, "15.0.0")
+
+        let (_, encrypted) = try thinImage("hello-ios-encrypted")
+        XCTAssertEqual(encrypted.encryption?.cryptID, 1)
+        XCTAssertEqual(encrypted.encryption?.isEncrypted, true)
+        XCTAssertEqual(encrypted.encryption?.fileOffset, 16384)
+    }
+
     // MARK: - Not Mach-O
 
     func testNonMachOReturnsNil() throws {

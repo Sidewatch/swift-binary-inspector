@@ -84,3 +84,13 @@ Mach-O file in /usr/bin, /usr/sbin, /bin, /sbin, /usr/libexec (top level),
 - 17 Sep 2026 — full audit (app + all 20 libraries), Claude with David.
 - 18 Sep 2026 — logic review (every source and test file, line by line), Claude with David.
 - 22 Oct 2026 — Mach-O structure parser added; validated against lipo/otool/nm (1,629 files, 4,126 slices, 0 mismatches); 60 mutants killed.
+- 22 Oct 2026 (evening) — real 32-bit and encrypted fixtures added (`make_fixtures.sh`): a LINKED 32-bit
+  executable (watchOS arm64_32: MH_MAGIC, LC_SEGMENT, 32-bit nlist), i386 and armv7 objects (current linkers refuse
+  to link either; clang still compiles them), an iOS executable linked `-encryptable` (a real
+  LC_ENCRYPTION_INFO_64, cryptid 0) and the same file with cryptid 1, as FairPlay leaves an App Store binary.
+  `scripts/validate_macho.py` over all 12 fixtures: 0 mismatches in every category, encryption included. Exact-value
+  tests from otool and nm; the fuzz and truncation tests cover the new files. Mutants killed: 32-bit nlist read as
+  64-bit, LC_SEGMENT read as LC_SEGMENT_64, cryptid read from the padding (caught only by the cryptid 1 copy).
+  Still only hand-built: big-endian images (only PowerPC produced them; no current Apple tool can, and LLVM's
+  big-endian ARM targets emit ELF) and lazy links (the linker no longer supports `-lazy_library`).
+

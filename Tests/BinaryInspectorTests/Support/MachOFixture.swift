@@ -16,6 +16,7 @@ enum MachOFixture {
     /// Every fixture, for the tests that run over all of them.
     static let all = [
         "hello-arm64", "hello-x86_64", "hello-universal", "hello-universal-fat64", "libgreeter.dylib", "plugin.bundle", "plugin.o",
+        "hello-arm64_32", "plugin-i386.o", "plugin-armv7.o", "hello-ios", "hello-ios-encrypted",
     ]
 
     /// The bytes of fixture `name`; fails the test when it is missing.
