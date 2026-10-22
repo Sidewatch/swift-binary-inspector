@@ -18,6 +18,14 @@ let package = Package(
             path: "Sources",
             resources: [.process("BinaryInspector/Localizable.xcstrings")],
             swiftSettings: [.swiftLanguageMode(.v6)]),
-        .testTarget(name: "BinaryInspectorTests", dependencies: ["BinaryInspector"], path: "Tests"),
+        .testTarget(
+            name: "BinaryInspectorTests", dependencies: ["BinaryInspector"], path: "Tests",
+            exclude: ["BinaryInspectorTests/Fixtures/src", "BinaryInspectorTests/Fixtures/make_fixtures.sh"],
+            resources: [.copy("BinaryInspectorTests/Fixtures/MachO")]),
+        // Development tool for scripts/validate_macho.py; deliberately not a product, so nothing
+        // that depends on this package builds or sees it.
+        .executableTarget(
+            name: "macho-dump", dependencies: ["BinaryInspector"], path: "Tools/MachODump",
+            swiftSettings: [.swiftLanguageMode(.v6)]),
     ]
 )
